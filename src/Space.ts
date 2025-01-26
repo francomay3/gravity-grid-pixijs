@@ -1,6 +1,6 @@
 import { Graphics } from "pixi.js";
 import { Planet } from "./Planet";
-import { minMax } from "./utils";
+import { Position } from "./Position";
 
 interface SpaceOptions {
   numberOfPlanets: number;
@@ -29,6 +29,27 @@ export class Space {
   public destroyPlanet(planet: Planet): void {
     planet.destroy();
     this.planets = this.planets.filter((p) => p !== planet);
+  }
+
+  public getCenterOfMass(): Position {
+    if (this.planets.length === 0) {
+      throw new Error("The points array must not be empty.");
+    }
+
+    let totalMass = 0;
+    let weightedXSum = 0;
+    let weightedYSum = 0;
+
+    for (const planet of this.planets) {
+      totalMass += planet.getMass();
+      weightedXSum += planet.getPosition().x * planet.getMass();
+      weightedYSum += planet.getPosition().y * planet.getMass();
+    }
+
+    const xCenter = weightedXSum / totalMass;
+    const yCenter = weightedYSum / totalMass;
+
+    return new Position({ x: xCenter, y: yCenter });
   }
 
   public update(delta: number): Promise<void> {
