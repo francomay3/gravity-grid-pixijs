@@ -12,14 +12,15 @@ initDevtools({ app });
   await app.init({ background: "#0d1024", resizeTo: window });
   document.getElementById("pixi-container")!.appendChild(app.canvas);
 
-  const space = new Space({ G: 0.01, planetsDensity: 1 });
+  const space = new Space({ G: 0.001, planetsDensity: 100 });
 
   space.addRandomPlanets({
-    count: 100,
-    minMass: 0,
+    count: 1000,
+    minMass: 500,
     maxMass: 1000,
     maxKineticEnergy: 5000,
-    area: { minX: 0, minY: 0, maxX: 1000, maxY: 1000 },
+    area: { minX: 0, minY: 0, maxX: app.screen.width, maxY: app.screen.height },
+    bias: 1000,
   });
 
   enableScreenEvents(app);

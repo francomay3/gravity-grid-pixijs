@@ -7,12 +7,15 @@ import {
   getPositionAfterCollission,
   getRandomSpeedFromKineticEnergyAndMass,
   getRadius,
+  biasSpeed,
 } from "./utils";
 
 export type PlanetOptions = {
   position: { x: number; y: number };
   mass: number;
   density: number;
+  bias: number;
+  center: Position;
 } & (
   | { speed: { x: number; y: number }; kineticEnergy?: never }
   | { speed?: never; kineticEnergy: number }
@@ -34,6 +37,8 @@ export class Planet {
     position,
     mass,
     density,
+    bias,
+    center,
   }: PlanetOptions) {
     this.position = new Position(position);
     this.mass = mass;
@@ -43,6 +48,8 @@ export class Planet {
     this.force = { x: 0, y: 0 };
     this.radius = getRadius(mass, density);
     this.density = density;
+
+    this.speed = biasSpeed(this.speed, this.position, center, bias);
 
     this.willDestroy = false;
 

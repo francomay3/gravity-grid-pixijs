@@ -9,6 +9,7 @@ interface AddRandomPlanetsOptions {
   maxMass: number;
   maxKineticEnergy: number;
   area: { minX: number; minY: number; maxX: number; maxY: number };
+  bias: number;
 }
 
 interface SpaceOptions {
@@ -38,7 +39,12 @@ export class Space {
     maxMass,
     maxKineticEnergy,
     area,
+    bias,
   }: AddRandomPlanetsOptions) {
+    const center = new Position({
+      x: area.maxX / 2,
+      y: area.maxY / 2,
+    });
     for (let i = 0; i < count; i++) {
       const mass = randomBetween(minMass, maxMass);
       const kineticEnergy = randomBetween(0, maxKineticEnergy);
@@ -51,6 +57,8 @@ export class Space {
         kineticEnergy,
         position,
         density: this.planetsDensity,
+        bias,
+        center,
       });
     }
   }

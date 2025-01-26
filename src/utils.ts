@@ -43,3 +43,27 @@ export const getPositionAfterCollission = (a: Planet, b: Planet): Position => {
     y: (a.position.y * a.mass + b.position.y * b.mass) / (a.mass + b.mass),
   });
 };
+
+export const biasSpeed = (
+  speed: Speed,
+  position: Position,
+  center: Position,
+  biasStrength: number = 0
+): Speed => {
+  const angle = Math.atan2(position.y - center.y, position.x - center.x);
+  const distanceToCenter = position.distance(center);
+
+  const bias = {
+    x:
+      Math.cos(angle + Math.PI / 2) *
+      randomBetween(0, biasStrength / distanceToCenter),
+    y:
+      Math.sin(angle + Math.PI / 2) *
+      randomBetween(0, biasStrength / distanceToCenter),
+  };
+
+  return {
+    x: speed.x + bias.x,
+    y: speed.y + bias.y,
+  };
+};
