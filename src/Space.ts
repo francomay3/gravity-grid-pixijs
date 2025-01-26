@@ -1,25 +1,58 @@
 import { Graphics } from "pixi.js";
-import { Planet } from "./Planet";
+import { Planet, PlanetOptions } from "./Planet";
 import { Position } from "./Position";
+import { randomBetween } from "./utils";
+
+interface AddRandomPlanetsOptions {
+  count: number;
+  minMass: number;
+  maxMass: number;
+  maxKineticEnergy: number;
+  area: { minX: number; minY: number; maxX: number; maxY: number };
+}
 
 interface SpaceOptions {
-  numberOfPlanets: number;
-  maxMass: number;
-  maxSpeed: number;
+  G: number;
+  planetsDensity: number;
 }
 
 export class Space {
   private planets: Planet[];
+  private G: number;
+  private planetsDensity: number;
 
-  constructor({ numberOfPlanets, maxMass, maxSpeed }: SpaceOptions) {
-    this.planets = Array.from({ length: numberOfPlanets }).map(
-      () =>
-        new Planet({
-          maxSpeed,
-          maxMass,
-          force: { x: 0, y: 0 },
-        })
-    );
+  constructor({ G, planetsDensity }: SpaceOptions) {
+    this.planets = [];
+    this.G = G;
+    this.planetsDensity = planetsDensity;
+  }
+
+  public addPlanet(options: PlanetOptions) {
+    const planet = new Planet(options);
+    this.planets.push(planet);
+  }
+
+  public addRandomPlanets({
+    count,
+    minMass,
+    maxMass,
+    maxKineticEnergy,
+    area,
+  }: AddRandomPlanetsOptions) {
+    for (let i = 0; i < count; i++) {
+      const mass = randomBetween(minMass, maxMass);
+      const kineticEnergy = randomBetween(0, maxKineticEnergy);
+      const position = {
+        x: randomBetween(area.minX, area.maxX),
+        y: randomBetween(area.minY, area.maxY),
+      };
+      this.addPlanet({
+        mass,
+        kineticEnergy,
+        position,
+        density: this.planetsDensity,
+      });
+    }
   }
 
   public getSprites(): Graphics[] {
@@ -52,20 +85,21 @@ export class Space {
     return new Position({ x: xCenter, y: yCenter });
   }
 
-  public update(delta: number): Promise<void> {
-    return new Promise((resolve) => {
-      this.planets.forEach((planetA) => {
-        this.planets.forEach((planetB) => {
-          if (planetA === planetB) {
-            resolve();
-          }
+  public update(delta: number): void {
+    this.planets.forEach((planetA) => {
+      this.planets.forEach((planetB) => {
+        if (planetA === planetB) return;
 
-          planetA.addForceFrom(planetB);
-        });
-
-        planetA.update(delta);
+        planetA.addForceFrom(planetB, this.G);
       });
-      resolve();
+    });
+
+    this.planets.forEach((planet) => {
+      if (planet.willDestroy) {
+        this.destroyPlanet(planet);
+      } else {
+        planet.update(delta);
+      }
     });
   }
 }
