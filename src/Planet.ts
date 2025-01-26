@@ -8,6 +8,7 @@ import {
   getRandomSpeedFromKineticEnergyAndMass,
   getRadius,
   biasSpeed,
+  getColorAfterColission,
 } from "./utils";
 
 export type PlanetOptions = {
@@ -16,6 +17,7 @@ export type PlanetOptions = {
   density: number;
   bias: number;
   center: Position;
+  color: number;
 } & (
   | { speed: { x: number; y: number }; kineticEnergy?: never }
   | { speed?: never; kineticEnergy: number }
@@ -30,6 +32,7 @@ export class Planet {
   public radius: number;
   public density: number;
   public willDestroy: boolean;
+  public color: number;
 
   constructor({
     speed,
@@ -39,6 +42,7 @@ export class Planet {
     density,
     bias,
     center,
+    color,
   }: PlanetOptions) {
     this.position = new Position(position);
     this.mass = mass;
@@ -48,12 +52,12 @@ export class Planet {
     this.force = { x: 0, y: 0 };
     this.radius = getRadius(mass, density);
     this.density = density;
-
+    this.color = color;
     this.speed = biasSpeed(this.speed, this.position, center, bias);
 
     this.willDestroy = false;
 
-    this.graphic = new Graphics().circle(0, 0, this.radius).fill(0xff0000);
+    this.graphic = new Graphics().circle(0, 0, this.radius).fill(color);
     this.graphic.position.set(this.position.x, this.position.y);
   }
 
@@ -107,13 +111,12 @@ export class Planet {
 
   public redraw(): void {
     this.graphic.clear();
-    this.graphic.circle(0, 0, this.radius).fill(0xff0000);
+    this.graphic.circle(0, 0, this.radius).fill(this.color);
   }
 
   public setMass(mass: number): void {
     this.mass = mass;
     this.radius = getRadius(mass, this.density);
-    this.redraw();
   }
 
   public addForceFrom(planet: Planet, G: number): void {
@@ -128,9 +131,12 @@ export class Planet {
       const newMass = this.mass + planet.mass;
       const newSpeed = getSpeedAfterCollission(this, planet);
       const newPosition = getPositionAfterCollission(this, planet);
+      const newColor = getColorAfterColission(this, planet);
       planet.speed = newSpeed;
       planet.setMass(newMass);
       planet.position = newPosition;
+      planet.color = newColor;
+      planet.redraw();
       return;
     }
 

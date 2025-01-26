@@ -15,12 +15,47 @@ initDevtools({ app });
   const space = new Space({ G: 0.001, planetsDensity: 100 });
 
   space.addRandomPlanets({
-    count: 1000,
+    count: 500,
     minMass: 500,
     maxMass: 1000,
     maxKineticEnergy: 5000,
-    area: { minX: 0, minY: 0, maxX: app.screen.width, maxY: app.screen.height },
+    area: {
+      minX: 0,
+      minY: 0,
+      maxX: app.screen.width,
+      maxY: app.screen.height,
+    },
+    bias: 100,
+    color: 0xff0000,
+  });
+  space.addRandomPlanets({
+    count: 500,
+    minMass: 500,
+    maxMass: 1000,
+    maxKineticEnergy: 5000,
+    area: {
+      minX: 0,
+      minY: 0,
+      maxX: app.screen.width,
+      maxY: app.screen.height,
+    },
     bias: 1000,
+    color: 0x00ff00,
+  });
+
+  space.addRandomPlanets({
+    count: 500,
+    minMass: 600,
+    maxMass: 2000,
+    maxKineticEnergy: 5000,
+    area: {
+      minX: 0,
+      minY: 0,
+      maxX: app.screen.width,
+      maxY: app.screen.height,
+    },
+    bias: 500,
+    color: 0x0000ff,
   });
 
   enableScreenEvents(app);
