@@ -12,7 +12,7 @@ export class Position {
     this.y = y;
   }
 
-  public distance(point: Position): number {
+  public distance(point: { x: number; y: number }): number {
     return Math.sqrt(
       Math.pow(this.x - point.x, 2) + Math.pow(this.y - point.y, 2)
     );

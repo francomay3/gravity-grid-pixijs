@@ -3,12 +3,9 @@ import { Position } from "./Position";
 import { Speed } from "./Speed";
 import { Force } from "./Force";
 import {
-  getSpeedAfterCollission,
-  getPositionAfterCollission,
   getRandomSpeedFromKineticEnergyAndMass,
   getRadius,
   biasSpeed,
-  getColorAfterColission,
 } from "./utils";
 
 export type PlanetOptions = {
@@ -49,7 +46,7 @@ export class Planet {
     this.speed = speed
       ? new Speed(speed)
       : getRandomSpeedFromKineticEnergyAndMass(kineticEnergy, mass);
-    this.force = { x: 0, y: 0 };
+    this.force = new Force({ x: 0, y: 0 });
     this.radius = getRadius(mass, density);
     this.density = density;
     this.color = color;
@@ -63,6 +60,15 @@ export class Planet {
 
   public getSpeed(): Speed {
     return this.speed;
+  }
+
+  public setPosition(position: { x: number; y: number }): void {
+    this.position = new Position(position);
+  }
+
+  public setColor(color: number): void {
+    this.color = color;
+    this.redraw();
   }
 
   public getPosition(): Position {
@@ -79,13 +85,18 @@ export class Planet {
   }
 
   public update(delta: number): void {
-    this.speed.x += this.force.x * delta;
-    this.speed.y += this.force.y * delta;
+    const acceleration = {
+      x: this.force.x / this.mass,
+      y: this.force.y / this.mass,
+    };
+
+    this.speed.x += acceleration.x * delta;
+    this.speed.y += acceleration.y * delta;
 
     this.position.x += this.speed.x * delta;
     this.position.y += this.speed.y * delta;
 
-    this.force = { x: 0, y: 0 };
+    this.force = new Force({ x: 0, y: 0 });
 
     this.graphic.position.set(this.position.x, this.position.y);
   }
@@ -117,42 +128,6 @@ export class Planet {
   public setMass(mass: number): void {
     this.mass = mass;
     this.radius = getRadius(mass, this.density);
-  }
-
-  public addForceFrom(planet: Planet, G: number): void {
-    if (planet === this || planet.willDestroy || this.willDestroy) {
-      return;
-    }
-
-    const distance = this.position.distance(planet.getPosition());
-
-    if (distance < this.radius + planet.radius) {
-      this.willDestroy = true;
-      const newMass = this.mass + planet.mass;
-      const newSpeed = getSpeedAfterCollission(this, planet);
-      const newPosition = getPositionAfterCollission(this, planet);
-      const newColor = getColorAfterColission(this, planet);
-      planet.speed = newSpeed;
-      planet.setMass(newMass);
-      planet.position = newPosition;
-      planet.color = newColor;
-      planet.redraw();
-      return;
-    }
-
-    const force = {
-      x:
-        G *
-        (planet.getMass() / distance) *
-        (planet.getPosition().x - this.getPosition().x) *
-        0.0001, // this is so that I dont need to use Gs that are so small
-      y:
-        G *
-        (planet.getMass() / distance) *
-        (planet.getPosition().y - this.getPosition().y) *
-        0.0001,
-    };
-
-    this.addForce(force);
+    this.redraw();
   }
 }

@@ -11,4 +11,8 @@ export class Force {
     this.x = x;
     this.y = y;
   }
+
+  public inverse(): Force {
+    return new Force({ x: -this.x, y: -this.y });
+  }
 }

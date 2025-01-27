@@ -1,7 +1,14 @@
 import { Graphics } from "pixi.js";
 import { Planet, PlanetOptions } from "./Planet";
 import { Position } from "./Position";
-import { randomBetween } from "./utils";
+import {
+  getColor,
+  getColorAfterColission,
+  getPositionAfterCollission,
+  getSpeedAfterCollission,
+  randomBetween,
+} from "./utils";
+import { Force } from "./Force";
 
 interface AddRandomPlanetsOptions {
   count: number;
@@ -10,7 +17,6 @@ interface AddRandomPlanetsOptions {
   maxKineticEnergy: number;
   area: { minX: number; minY: number; maxX: number; maxY: number };
   bias: number;
-  color: number;
 }
 
 interface SpaceOptions {
@@ -41,7 +47,6 @@ export class Space {
     maxKineticEnergy,
     area,
     bias,
-    color,
   }: AddRandomPlanetsOptions) {
     const center = new Position({
       x: area.maxX / 2,
@@ -54,6 +59,8 @@ export class Space {
         x: randomBetween(area.minX, area.maxX),
         y: randomBetween(area.minY, area.maxY),
       };
+      const color = getColor(area, position);
+
       this.addPlanet({
         mass,
         kineticEnergy,
@@ -97,13 +104,44 @@ export class Space {
   }
 
   public update(delta: number): void {
-    this.planets.forEach((planetA) => {
-      this.planets.forEach((planetB) => {
-        if (planetA === planetB) return;
+    for (let i = 0; i < this.planets.length; i++) {
+      const planetA = this.planets[i];
+      for (let j = i + 1; j < this.planets.length; j++) {
+        const planetB = this.planets[j];
+        if (planetB.willDestroy || planetA.willDestroy) {
+          continue;
+        }
+        const distance = planetA.position.distance(planetB.getPosition());
 
-        planetA.addForceFrom(planetB, this.G);
-      });
-    });
+        if (distance < planetA.radius + planetB.radius) {
+          planetA.willDestroy = true;
+          const newMass = planetA.mass + planetB.mass;
+          const newSpeed = getSpeedAfterCollission(planetA, planetB);
+          const newPosition = getPositionAfterCollission(planetA, planetB);
+          const newColor = getColorAfterColission(
+            planetA.color,
+            planetA.mass,
+            planetB.color,
+            planetB.mass
+          );
+          planetB.setSpeed(newSpeed);
+          planetB.setMass(newMass);
+          planetB.setPosition(newPosition);
+          planetB.setColor(newColor);
+          planetB.redraw();
+          continue;
+        }
+
+        const force = this.calculateGravitationalForce(
+          planetA,
+          planetB,
+          distance
+        );
+
+        planetA.addForce(force);
+        planetB.addForce(force.inverse());
+      }
+    }
 
     this.planets.forEach((planet) => {
       if (planet.willDestroy) {
@@ -111,6 +149,26 @@ export class Space {
       } else {
         planet.update(delta);
       }
+    });
+  }
+
+  private calculateGravitationalForce(
+    planetA: Planet,
+    planetB: Planet,
+    distance: number
+  ) {
+    const forceMagnitude =
+      this.G *
+      ((planetA.getMass() * planetB.getMass()) / (distance * distance));
+
+    // Calculate direction vector
+    const dx = planetB.getPosition().x - planetA.getPosition().x;
+    const dy = planetB.getPosition().y - planetA.getPosition().y;
+
+    // Return force vector
+    return new Force({
+      x: forceMagnitude * (dx / distance),
+      y: forceMagnitude * (dy / distance),
     });
   }
 }

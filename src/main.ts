@@ -12,50 +12,20 @@ initDevtools({ app });
   await app.init({ background: "#0d1024", resizeTo: window });
   document.getElementById("pixi-container")!.appendChild(app.canvas);
 
-  const space = new Space({ G: 0.001, planetsDensity: 100 });
+  const space = new Space({ G: 0.0001, planetsDensity: 10000 });
 
   space.addRandomPlanets({
     count: 500,
-    minMass: 500,
-    maxMass: 1000,
-    maxKineticEnergy: 5000,
+    minMass: 50000,
+    maxMass: 100000,
+    maxKineticEnergy: 10000,
     area: {
       minX: 0,
       minY: 0,
       maxX: app.screen.width,
       maxY: app.screen.height,
     },
-    bias: 100,
-    color: 0xff0000,
-  });
-  space.addRandomPlanets({
-    count: 500,
-    minMass: 500,
-    maxMass: 1000,
-    maxKineticEnergy: 5000,
-    area: {
-      minX: 0,
-      minY: 0,
-      maxX: app.screen.width,
-      maxY: app.screen.height,
-    },
-    bias: 1000,
-    color: 0x00ff00,
-  });
-
-  space.addRandomPlanets({
-    count: 500,
-    minMass: 600,
-    maxMass: 2000,
-    maxKineticEnergy: 5000,
-    area: {
-      minX: 0,
-      minY: 0,
-      maxX: app.screen.width,
-      maxY: app.screen.height,
-    },
-    bias: 500,
-    color: 0x0000ff,
+    bias: 3,
   });
 
   enableScreenEvents(app);
