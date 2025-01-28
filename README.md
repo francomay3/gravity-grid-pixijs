@@ -1,10 +1,6 @@
 # GravityGrid
 
-A TypeScript-based gravity simulation that visualizes planetary motion using PixiJS.
-
-## Overview
-
-GravityGrid is an interactive space simulation that demonstrates gravitational interactions between celestial bodies. The project uses modern web technologies to create an engaging visualization of planetary motion.
+A TypeScript-based gravity simulation that visualizes celestial body motion using PixiJS.
 
 ## Features
 
@@ -78,35 +74,57 @@ The built files will be in the `dist` directory.
 
 ### User Interface
 
-- Implement hand cursor for panning that closes/opens to indicate screen pinching
+- ~~Implement hand cursor for panning that closes/opens to indicate screen pinching~~
 - Add planet creation mode with mouse interaction
   - Switch between navigation and planet creation states
   - Create planets with initial velocity based on mouse movement
+- Add basic simulation controls
+  - Add pause/continue button
+  - Add refresh/reset button
+  - Add speed control slider
+  - Add planet count display
+
+### React Integration
+
+- Add React wrapper for UI controls
+  - Create React context for Space instance
+  - Implement pause menu component
+  - Add simulation control panel
+  - Connect Space controls to React state
+- Style UI components
+  - Design cohesive theme
+  - Add animations for menu transitions
+  - Make UI responsive
+- Add settings panel
+  - Implement gravity constant control
+  - Add planet density control
+  - Add bias strength control
 
 ### Planet Features
 
 - Enhance planet customization
-  - Add configurable mass ranges (min/max)
-  - Add configurable speed ranges (min/max)
-  - Make planet radius proportional to mass
-  - Implement color schemes (random or mass-dependent)
+  - ~~Add configurable mass ranges (min/max)~~
+  - ~~Add configurable speed ranges (min/max)~~
+  - ~~Make planet radius proportional to mass~~
+  - ~~Implement color schemes (random or mass-dependent)~~
 
 ### Space Features
 
-- Add methods to dynamically create new planets
-- Expand configuration options for planet generation
+- ~~Add methods to dynamically create new planets~~
+- ~~Expand configuration options for planet generation~~
 
 ### Performance Optimization
 
+- implement barnes hut algorythm to simulate way more planets
 - Profile and identify computationally intensive functions
 - Implement performance-critical calculations in C/WebAssembly
 
 ### Physics
 
-- Implement planet collision mechanics
-  - Detect collisions between planets
-  - Merge colliding planets
-  - Calculate resulting mass and velocity
+- ~~Implement planet collision mechanics~~
+  - ~~Detect collisions between planets~~
+  - ~~Merge colliding planets~~
+  - ~~Calculate resulting mass and velocity~~
 
 ### Visual Effects
 
