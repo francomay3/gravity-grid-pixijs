@@ -1,4 +1,4 @@
-import { Graphics } from "pixi.js";
+import { Container, Graphics } from "pixi.js";
 import {
   getRandomSpeedDirectionFromKineticEnergyAndMass,
   getRadius,
@@ -28,6 +28,7 @@ export class Planet {
   public density: number;
   public willDestroy: boolean;
   public color: number;
+  public container: Container;
 
   constructor({
     speed,
@@ -39,6 +40,7 @@ export class Planet {
     center,
     color,
   }: PlanetOptions) {
+    this.container = new Container();
     this.position = position;
     this.mass = mass;
     this.speed = speed
@@ -54,6 +56,7 @@ export class Planet {
 
     this.graphic = new Graphics().circle(0, 0, this.radius).fill(color);
     this.graphic.position.set(this.position.x, this.position.y);
+    this.container.addChild(this.graphic);
   }
 
   public getSpeed(): Coordinates {
@@ -97,10 +100,6 @@ export class Planet {
     this.force = new Coordinates(0, 0);
 
     this.graphic.position.set(this.position.x, this.position.y);
-  }
-
-  public getGraphic(): Graphics {
-    return this.graphic;
   }
 
   public setSpeed(speed: Coordinates): void {

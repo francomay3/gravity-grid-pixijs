@@ -5,6 +5,9 @@ export const randomBetween = (min: number, max: number) => {
   return min + Math.random() * (max - min);
 };
 
+export const clamp = (value: number, min: number, max: number) =>
+  Math.min(Math.max(value, min), max);
+
 export const getRandomSpeedDirectionFromKineticEnergyAndMass = (
   kineticEnergy: number,
   mass: number

@@ -1,5 +1,6 @@
 import { Space } from ".";
 import { getColorAfterColission } from "../colorUtils";
+import { Coordinates } from "../Coordinates";
 import { getPositionAfterCollission, getSpeedAfterCollission } from "../utils";
 
 export const update = (space: Space, delta: number) => {
@@ -31,10 +32,16 @@ export const update = (space: Space, delta: number) => {
         continue;
       }
 
-      const force = space.calculateGravitationalForce(
-        planetA,
-        planetB,
-        distance
+      const forceMagnitude =
+        space.G *
+        ((planetA.getMass() * planetB.getMass()) / (distance * distance));
+
+      const dx = planetB.getPosition().x - planetA.getPosition().x;
+      const dy = planetB.getPosition().y - planetA.getPosition().y;
+
+      const force = new Coordinates(
+        forceMagnitude * (dx / distance),
+        forceMagnitude * (dy / distance)
       );
 
       planetA.addForce(force);
