@@ -1,30 +1,28 @@
 import { Graphics } from "pixi.js";
-import { Position } from "./Position";
-import { Speed } from "./Speed";
-import { Force } from "./Force";
 import {
-  getRandomSpeedFromKineticEnergyAndMass,
+  getRandomSpeedDirectionFromKineticEnergyAndMass,
   getRadius,
   biasSpeed,
 } from "./utils";
+import { Coordinates } from "./Coordinates";
 
 export type PlanetOptions = {
-  position: { x: number; y: number };
+  position: Coordinates;
   mass: number;
   density: number;
   bias: number;
-  center: Position;
+  center: Coordinates;
   color: number;
 } & (
-  | { speed: { x: number; y: number }; kineticEnergy?: never }
+  | { speed: Coordinates; kineticEnergy?: never }
   | { speed?: never; kineticEnergy: number }
 );
 
 export class Planet {
-  public speed: Speed;
-  public position: Position;
+  public speed: Coordinates;
+  public position: Coordinates;
   public mass: number;
-  public force: Force;
+  public force: Coordinates;
   public graphic: Graphics;
   public radius: number;
   public density: number;
@@ -41,12 +39,12 @@ export class Planet {
     center,
     color,
   }: PlanetOptions) {
-    this.position = new Position(position);
+    this.position = position;
     this.mass = mass;
     this.speed = speed
-      ? new Speed(speed)
-      : getRandomSpeedFromKineticEnergyAndMass(kineticEnergy, mass);
-    this.force = new Force({ x: 0, y: 0 });
+      ? speed
+      : getRandomSpeedDirectionFromKineticEnergyAndMass(kineticEnergy, mass);
+    this.force = new Coordinates(0, 0);
     this.radius = getRadius(mass, density);
     this.density = density;
     this.color = color;
@@ -58,12 +56,12 @@ export class Planet {
     this.graphic.position.set(this.position.x, this.position.y);
   }
 
-  public getSpeed(): Speed {
+  public getSpeed(): Coordinates {
     return this.speed;
   }
 
-  public setPosition(position: { x: number; y: number }): void {
-    this.position = new Position(position);
+  public setPosition(position: Coordinates): void {
+    this.position = new Coordinates(position.x, position.y);
   }
 
   public setColor(color: number): void {
@@ -71,7 +69,7 @@ export class Planet {
     this.redraw();
   }
 
-  public getPosition(): Position {
+  public getPosition(): Coordinates {
     return this.position;
   }
 
@@ -79,7 +77,7 @@ export class Planet {
     return this.mass;
   }
 
-  public addForce(force: Force): void {
+  public addForce(force: Coordinates): void {
     this.force.x += force.x;
     this.force.y += force.y;
   }
@@ -96,7 +94,7 @@ export class Planet {
     this.position.x += this.speed.x * delta;
     this.position.y += this.speed.y * delta;
 
-    this.force = new Force({ x: 0, y: 0 });
+    this.force = new Coordinates(0, 0);
 
     this.graphic.position.set(this.position.x, this.position.y);
   }
@@ -105,15 +103,15 @@ export class Planet {
     return this.graphic;
   }
 
-  public setSpeed(speed: Speed): void {
+  public setSpeed(speed: Coordinates): void {
     this.speed = speed;
   }
 
-  public getKineticEnergy(): { x: number; y: number } {
-    return {
-      x: 0.5 * this.mass * this.speed.x ** 2,
-      y: 0.5 * this.mass * this.speed.y ** 2,
-    };
+  public getKineticEnergy(): Coordinates {
+    return new Coordinates(
+      0.5 * this.mass * this.speed.x ** 2,
+      0.5 * this.mass * this.speed.y ** 2
+    );
   }
 
   public destroy(): void {
