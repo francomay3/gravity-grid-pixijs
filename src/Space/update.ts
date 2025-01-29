@@ -1,6 +1,6 @@
 import { Space } from ".";
 import { getColorAfterColission } from "../colorUtils";
-import { Coordinates } from "../Coordinates";
+import { Vector2 } from "../vector2";
 import { getPositionAfterCollission, getSpeedAfterCollission } from "../utils";
 
 export const update = (space: Space, delta: number) => {
@@ -39,7 +39,7 @@ export const update = (space: Space, delta: number) => {
       const dx = planetB.getPosition().x - planetA.getPosition().x;
       const dy = planetB.getPosition().y - planetA.getPosition().y;
 
-      const force = new Coordinates(
+      const force = new Vector2(
         forceMagnitude * (dx / distance),
         forceMagnitude * (dy / distance)
       );

@@ -1,4 +1,4 @@
-import { Coordinates } from "./Coordinates";
+import { Vector2 } from "./vector2";
 
 function rgbToHsl(r: number, g: number, b: number): [number, number, number] {
   r /= 255;
@@ -60,20 +60,15 @@ function hslToRgb(h: number, s: number, l: number): [number, number, number] {
 const colors = [0x36ff33, 0xff33f9, 0xff3737, 0xe3ff45, 0xffb955, 0x55f7ff];
 
 export const getColor = (
-  area: { minX: number; minY: number; maxX: number; maxY: number },
-  position: Coordinates
+  center: Vector2,
+  radius: number,
+  position: Vector2
 ): number => {
-  const maxDistance = new Coordinates(area.minX, area.minY).distanceTo(
-    new Coordinates(area.maxX, area.maxY)
-  );
-
-  const distanceToEdge = position.distanceTo(
-    new Coordinates(area.maxX, area.maxY)
-  );
+  const distanceToEdge = position.distanceTo(center);
 
   return colors[
     Math.min(
-      Math.floor((distanceToEdge / maxDistance) * colors.length),
+      Math.floor((distanceToEdge / radius) * colors.length),
       colors.length - 1
     )
   ];

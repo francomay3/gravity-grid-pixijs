@@ -1,4 +1,4 @@
-import { Coordinates } from "./Coordinates";
+import { Vector2 } from "./vector2";
 import { Planet } from "./Planet";
 
 export const randomBetween = (min: number, max: number) => {
@@ -11,10 +11,10 @@ export const clamp = (value: number, min: number, max: number) =>
 export const getRandomSpeedDirectionFromKineticEnergyAndMass = (
   kineticEnergy: number,
   mass: number
-): Coordinates => {
+): Vector2 => {
   const speed = Math.sqrt((2 * kineticEnergy) / mass);
   const angle = randomBetween(0, 2 * Math.PI);
-  return new Coordinates(speed * Math.cos(angle), speed * Math.sin(angle));
+  return new Vector2(speed * Math.cos(angle), speed * Math.sin(angle));
 };
 
 export const getRadius = (mass: number, density: number): number =>
@@ -28,40 +28,44 @@ export const getSpeedFromKineticEnergy = (
   mass: number
 ): number => Math.sqrt((2 * kineticEnergy) / mass);
 
-export const getSpeedAfterCollission = (a: Planet, b: Planet): Coordinates => {
-  return new Coordinates(
+export const getSpeedAfterCollission = (a: Planet, b: Planet): Vector2 => {
+  return new Vector2(
     (a.speed.x * a.mass + b.speed.x * b.mass) / (a.mass + b.mass),
     (a.speed.y * a.mass + b.speed.y * b.mass) / (a.mass + b.mass)
   );
 };
 
-export const getPositionAfterCollission = (
-  a: Planet,
-  b: Planet
-): Coordinates => {
-  return new Coordinates(
+export const getPositionAfterCollission = (a: Planet, b: Planet): Vector2 => {
+  return new Vector2(
     (a.position.x * a.mass + b.position.x * b.mass) / (a.mass + b.mass),
     (a.position.y * a.mass + b.position.y * b.mass) / (a.mass + b.mass)
   );
 };
 
-export const biasSpeed = (
-  speed: Coordinates,
-  position: Coordinates,
-  center: Coordinates,
-  biasStrength: number = 0
-): Coordinates => {
-  const angle = Math.atan2(position.y - center.y, position.x - center.x);
-  const distanceToCenter = position.distanceTo(center);
+export const getOrbitalSpeed = (
+  position: Vector2,
+  G: number,
+  galaxyCenter: Vector2,
+  galaxyMass: number,
+  galaxyRadius: number
+): Vector2 => {
+  const dx = position.x - galaxyCenter.x;
+  const dy = position.y - galaxyCenter.y;
+  const r = Math.sqrt(dx * dx + dy * dy);
 
-  const factor = 0.001;
+  const effectiveMass = galaxyMass * Math.pow(r / galaxyRadius, 3);
 
-  const bias = new Coordinates(
-    Math.cos(angle + Math.PI / 2) *
-      randomBetween(0, distanceToCenter * biasStrength * factor),
-    Math.sin(angle + Math.PI / 2) *
-      randomBetween(0, distanceToCenter * biasStrength * factor)
-  );
+  const speed = Math.sqrt((G * effectiveMass) / r);
 
-  return new Coordinates(speed.x + bias.x, speed.y + bias.y);
+  const vx = speed * (-dy / r);
+  const vy = speed * (dx / r);
+
+  return new Vector2(vx, vy);
+};
+
+export const getRandomVector = (maxLength: number): Vector2 => {
+  return new Vector2(
+    randomBetween(-maxLength, maxLength),
+    randomBetween(-maxLength, maxLength)
+  ).rotate(randomBetween(0, 2 * Math.PI));
 };
